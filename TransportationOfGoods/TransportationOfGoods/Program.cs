@@ -13,7 +13,7 @@ namespace TransportationOfGoods
             TransportPool transportPool = new TransportPool();
             while (true)
             {
-                Console.WriteLine("Sending a parcel");
+                Console.WriteLine("Sending a parcels");
                 var weight = ReadDouble("weigth");
                 var distance = ReadDouble("distance");
                 Console.WriteLine("If you want to deliver the parcel faster click Enter, if cheaper click another key");
