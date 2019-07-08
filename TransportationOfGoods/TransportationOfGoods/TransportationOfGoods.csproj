@@ -50,6 +50,7 @@
     <Compile Include="Driver.cs" />
     <Compile Include="DriverNotFoundException.cs" />
     <Compile Include="Driving.cs" />
+    <Compile Include="Engine.cs" />
     <Compile Include="Flying.cs" />
     <Compile Include="FourWheels.cs" />
     <Compile Include="Gidroscutter.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="Truck.cs" />
     <Compile Include="TwoCaterpillars.cs" />
     <Compile Include="TwoWheels.cs" />
+    <Compile Include="Zerro.cs" />
     <Compile Include="Zil.cs" />
   </ItemGroup>
   <ItemGroup>

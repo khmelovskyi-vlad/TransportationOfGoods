@@ -12,5 +12,9 @@ namespace TransportationOfGoods
             : base(loadCapacity, maxDistance, speed)
         {
         }
+        public Gidroscutter(double loadCapacity, double maxDistance, double weightTransport, double power, double weightTransportWithParcel, double frictionCoefficient)
+            : base(loadCapacity, maxDistance, weightTransport, power, weightTransport, frictionCoefficient)
+        {
+        }
     }
 }

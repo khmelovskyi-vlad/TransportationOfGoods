@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace TransportationOfGoods
 {
-    class Boat : Swiming
+    class Zerro : Transport
     {
-        public Boat(double loadCapacity, double maxDistance, double speed)
+        public Zerro(double loadCapacity, double maxDistance, double speed)
             : base(loadCapacity, maxDistance, speed)
         {
         }
-        public Boat(double loadCapacity, double maxDistance, double weightTransport, double power, double weightTransportWithParcel, double frictionCoefficient)
+        public Zerro(double loadCapacity, double maxDistance, double weightTransport, double power, double weightTransportWithParcel, double frictionCoefficient)
             : base(loadCapacity, maxDistance, weightTransport, power, weightTransport, frictionCoefficient)
         {
         }

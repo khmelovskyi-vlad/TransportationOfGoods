@@ -9,7 +9,7 @@ namespace TransportationOfGoods
     class TransortNotFoundException : Exception
     {
         public TransortNotFoundException()
-            :base("Situable transport do't found")
+            :base("Situable transport don't found")
         {
 
         }
