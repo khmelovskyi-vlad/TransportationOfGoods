@@ -27,5 +27,8 @@ namespace TransportationOfGoods
             return false;
         }
         public bool Busy { get; set; }
+        public DateTime[] StartTime { get; set; }
+        public DateTime[] EndtTime { get; set; }
+        public int numTrip { get; set; }
     }
 }

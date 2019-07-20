@@ -10,10 +10,12 @@ namespace TransportationOfGoods
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("Sending a parcels");
             TransportPool transportPool = new TransportPool();
+            var numParcel = 0;
             while (true)
             {
-                Console.WriteLine("Sending a parcels");
+                numParcel++;
                 var weight = ReadDouble("weigth");
                 var distance = ReadDouble("distance");
                 Console.WriteLine("If you want to deliver the parcel faster click Enter, if cheaper click another key");
@@ -45,7 +47,7 @@ namespace TransportationOfGoods
                 {
                     try
                     {
-                        var needTransport = transportPool.Tranfer(weight, distance);
+                        var needTransport = transportPool.Tranfer(weight, distance, numParcel);
                         Console.WriteLine(needTransport);
                         var key = ReadChar();
                         if (key.Key == ConsoleKey.Escape)
@@ -56,7 +58,7 @@ namespace TransportationOfGoods
                     catch (TransortNotFoundException ex)
                     {
                         Console.WriteLine($"{ex.Message}");
-                        var needTransport = transportPool.Tranfer(weight, distance);
+                        var needTransport = transportPool.Tranfer(weight, distance, numParcel);
                         var key = ReadChar();
                         if (key.Key == ConsoleKey.Escape)
                         {
