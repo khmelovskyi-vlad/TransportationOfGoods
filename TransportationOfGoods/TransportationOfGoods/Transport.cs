@@ -51,10 +51,18 @@ namespace TransportationOfGoods
             } while (true);
             return dateOfDeparture;
         }
-        public virtual DateTime Arrival (double distance, DateTime dateOfDeparture)
+        public virtual DateTime Arrival (double distance, DateTime dateOfDeparture, ConsoleKeyInfo speedOrEconom)
         {
             DateTime dateOfArrival = new DateTime();
-            var duration = TimeSpan.FromHours(distance / Speed);
+            TimeSpan duration;
+            if (speedOrEconom.Key == ConsoleKey.Enter)
+            {
+                duration = TimeSpan.FromHours(distance / (Engine.Power / (Engine.WeightTransportWithParcel * Engine.FrictionCoefficient * 0.0098)));
+            }
+            else
+            {
+                duration = TimeSpan.FromHours(distance / Speed);
+            }
             dateOfArrival = dateOfDeparture.Add(duration);
             return dateOfArrival;
         }
@@ -98,7 +106,7 @@ namespace TransportationOfGoods
             {
                 throw new DriverNotFoundException();
             }
-            var l = Power / (WeightTransportWithParcel * FrictionCoefficient * 0.0098);
+            var l = Engine.Power / (Engine.WeightTransportWithParcel * Engine.FrictionCoefficient * 0.0098);
             var duration = TimeSpan.FromHours(distance / (l));
 
             do

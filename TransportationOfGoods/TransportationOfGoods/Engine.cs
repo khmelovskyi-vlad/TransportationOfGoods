@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TransportationOfGoods
 {
-    abstract class Engine
+    class Engine
     {
         public Engine(double weightTransport, double power, double weightTransportWithParcel, double frictionCoefficient)
         {

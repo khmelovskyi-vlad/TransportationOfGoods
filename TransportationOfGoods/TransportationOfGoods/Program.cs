@@ -24,7 +24,7 @@ namespace TransportationOfGoods
                 {
                     try
                     {
-                        var needTransport = transportPool.TransferTrinsportsWithEngine(weight, distance);
+                        var needTransport = transportPool.Test2(weight, distance, numParcel, speedOrEconom);
                         Console.WriteLine(needTransport);
                         var key = ReadChar();
                         if (key.Key == ConsoleKey.Escape)
@@ -35,7 +35,7 @@ namespace TransportationOfGoods
                     catch (TransortNotFoundException ex)
                     {
                         Console.WriteLine($"{ex.Message}");
-                        var needTransport = transportPool.TransferTrinsportsWithEngine(weight, distance);
+                        var needTransport = transportPool.Test2(weight, distance, numParcel, speedOrEconom);
                         var key = ReadChar();
                         if (key.Key == ConsoleKey.Escape)
                         {
@@ -47,7 +47,7 @@ namespace TransportationOfGoods
                 {
                     try
                     {
-                        var needTransport = transportPool.Tranfer(weight, distance, numParcel);
+                        var needTransport = transportPool.Test(weight, distance, numParcel, speedOrEconom);
                         Console.WriteLine(needTransport);
                         var key = ReadChar();
                         if (key.Key == ConsoleKey.Escape)
@@ -58,7 +58,7 @@ namespace TransportationOfGoods
                     catch (TransortNotFoundException ex)
                     {
                         Console.WriteLine($"{ex.Message}");
-                        var needTransport = transportPool.Tranfer(weight, distance, numParcel);
+                        var needTransport = transportPool.Test(weight, distance, numParcel, speedOrEconom);
                         var key = ReadChar();
                         if (key.Key == ConsoleKey.Escape)
                         {

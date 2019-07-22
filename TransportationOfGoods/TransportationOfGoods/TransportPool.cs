@@ -25,27 +25,33 @@ namespace TransportationOfGoods
             };
             transportsWithEngine = new Transport[]
             {
-                new Shipe (10000, 5000, 4000, 1000, 0, 0.2),
-                new Gidroscutter(0.020, 23, 0.05, 10, 0, 0.2),
-                new Boat(1, 100, 0.11, 15, 0, 0.2),
-                new Airplane(20000, 25000, 900, 12000, 0, 0.09),
-                new Tank(20, 30, 70, 700, 0, 0.1),
-                new Kamaz(2, 600, 4.2, 154, 0, 0.1),
-                new Zil(1.5, 700, 3.7, 110, 0, 0.1),
-                new Mers(0.7, 1000, 1.8, 150, 0, 0.1),
-                new Kapeyka(0.5, 300, 1.3, 50, 0, 0.1),
-                new Motorbike(0.05, 7, 0.15, 20, 0, 0.1),
-                new Bike(0.03, 3, 0.02, 0.001, 0, 0.1),
+                new Shipe (10000, 5000, new Engine(4000, 1000, 0, 0.2)),
+                new Gidroscutter(0.020, 23, new Engine(0.05, 10, 0, 0.2)),
+                new Boat(1, 100, new Engine(0.11, 15, 0, 0.2)),
+                new Airplane(20000, 25000, new Engine(900, 12000, 0, 0.09)),
+                new Tank(20, 30, new Engine(70, 700, 0, 0.1)),
+                new Kamaz(2, 600, new Engine(4.2, 154, 0, 0.1)),
+                new Zil(1.5, 700, new Engine(3.7, 110, 0, 0.1)),
+                new Mers(0.7, 1000, new Engine(1.8, 150, 0, 0.1)),
+                new Kapeyka(0.5, 300, new Engine(1.3, 50, 0, 0.1)),
+                new Motorbike(0.05, 7, new Engine(0.15, 20, 0, 0.1)),
+                new Bike(0.03, 3, new Engine(0.02, 0.001, 0, 0.1)),
             };
             drivers = new Driver[]
             {
                 new Driver("Valodya", new Type[]{typeof(Zil),typeof(Kamaz), typeof(Airplane), typeof(Mers), typeof(Kapeyka), typeof(Shipe)}),
+                new Driver("Valodya", new Type[]{typeof(Zil),typeof(Kamaz), typeof(Airplane), typeof(Mers), typeof(Kapeyka), typeof(Shipe)}),
+            };
+            engines = new Engine[]
+            {
+                new Engine(0.11, 15, 0, 0.2),
             };
         }
 
         Transport[] transportsWithEngine;
         Transport[] transports;
         Driver[] drivers;
+        Engine[] engines;
         public virtual DateTime Departure()
         {
             DateTime dateOfDeparture = new DateTime();
@@ -68,7 +74,237 @@ namespace TransportationOfGoods
             } while (true);
             return dateOfDeparture;
         }
+        public bool FindNotNeedTransportInArray(Transport[] needTransportArray, int transportLength, Transport necessaryTransports)
+        {
+            if (transportLength != 0)
+            {
+                for (int i = 0; i < needTransportArray.Length; i++)
+                {
+                    if (necessaryTransports == needTransportArray[i])
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        public (double maxDistanceAllTransports, double maxLoadCapacityAllTransports) FindMaxDistanceAndMaxLoadCapacity (Transport necessaryTransports, double maxDistanceAllTransports, double maxLoadCapacityAllTransports)
+        {
 
+            if (maxDistanceAllTransports < necessaryTransports.MaxDistance)
+            {
+                maxDistanceAllTransports = necessaryTransports.MaxDistance;
+            }
+            if (maxLoadCapacityAllTransports < necessaryTransports.LoadCapacity)
+            {
+                maxLoadCapacityAllTransports = necessaryTransports.LoadCapacity;
+            }
+            return (maxDistanceAllTransports, maxLoadCapacityAllTransports);
+        }
+        public bool NecessaryTransportsBusy(DateTime departure, Transport necessaryTransports, double distance, ConsoleKeyInfo speedOrEconom)
+        {
+            if (necessaryTransports.Busy)
+            {
+                var arrival = necessaryTransports.Arrival(distance, departure, speedOrEconom);
+                for (int i = 0; i < necessaryTransports.numTrip; i++)
+                {
+                    if ((departure >= necessaryTransports.StartTime[i] && departure <= necessaryTransports.EndtTime[i]) || (arrival >= necessaryTransports.StartTime[i] && arrival <= necessaryTransports.EndtTime[i]) || (departure <= necessaryTransports.StartTime[i] && arrival >= necessaryTransports.EndtTime[i]))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        public Transport FindTranportWithEngint(double weight, double distance, DateTime departure, Transport needTransport, Transport[] needTransportArray, int transportLength, ConsoleKeyInfo speedOrEconom)
+        {
+            var maxDistanceAllTransports = 0d;
+            var maxLoadCapacityAllTransports = 0d;
+            var havingTransport = false;
+            var flagToTransport = false;
+            var firstSpeed = 0d;
+            var maxSpeed = 0d;
+            var weightToDistance = 0d;
+            var needTransportWeightToDistance = double.MaxValue;
+            foreach (var necessaryTransports in transports)
+            {
+                (maxDistanceAllTransports, maxLoadCapacityAllTransports) = FindMaxDistanceAndMaxLoadCapacity(necessaryTransports, maxDistanceAllTransports, maxLoadCapacityAllTransports);
+                havingTransport = FindNotNeedTransportInArray(needTransportArray, transportLength, necessaryTransports);
+                flagToTransport = NecessaryTransportsBusy(departure, necessaryTransports, distance, speedOrEconom);
+                if (weight > necessaryTransports.LoadCapacity || distance > necessaryTransports.MaxDistance || necessaryTransports.Busy || havingTransport == true)
+                {
+                    continue;
+                }
+                if (speedOrEconom.Key == ConsoleKey.Enter)
+                {
+                    necessaryTransports.Engine.WeightTransportWithParcel = necessaryTransports.Engine.WeightTransport + weight;
+                    maxSpeed = necessaryTransports.Engine.Power / (necessaryTransports.Engine.WeightTransportWithParcel * necessaryTransports.Engine.FrictionCoefficient * 0.0098);
+                    if (maxSpeed > firstSpeed)
+                    {
+                        firstSpeed = maxSpeed;
+                        needTransport = necessaryTransports;
+                    }
+                }
+                else
+                {
+                    weightToDistance = necessaryTransports.LoadCapacity * necessaryTransports.MaxDistance;
+                    if (weightToDistance < needTransportWeightToDistance)
+                    {
+                        needTransportWeightToDistance = weightToDistance;
+                        needTransport = necessaryTransports;
+                    }
+                }
+            }
+            BigParcel(maxDistanceAllTransports, maxLoadCapacityAllTransports, weight, distance);
+            return (needTransport);
+
+        }
+        public Transport FindTranport(double weight, double distance, DateTime departure, Transport needTransport, Transport[] needTransportArray, int transportLength, ConsoleKeyInfo speedOrEconom)
+        {
+            var maxDistanceAllTransports = 0d;
+            var maxLoadCapacityAllTransports = 0d;
+            var havingTransport = false;
+            var flagToTransport = false;
+            var weightToDistance = 0d;
+            var needTransportWeightToDistance = double.MaxValue;
+            foreach (var necessaryTransports in transports)
+            {
+                (maxDistanceAllTransports, maxLoadCapacityAllTransports) = FindMaxDistanceAndMaxLoadCapacity(necessaryTransports, maxDistanceAllTransports, maxLoadCapacityAllTransports);
+                havingTransport = FindNotNeedTransportInArray(needTransportArray, transportLength, necessaryTransports);
+                flagToTransport = NecessaryTransportsBusy(departure, necessaryTransports, distance, speedOrEconom);
+                if (weight > necessaryTransports.LoadCapacity || distance > necessaryTransports.MaxDistance || flagToTransport || havingTransport == true)
+                {
+                    continue;
+                }
+                else
+                {
+                    weightToDistance = necessaryTransports.LoadCapacity * necessaryTransports.MaxDistance;
+                    if (weightToDistance < needTransportWeightToDistance)
+                    {
+                        needTransportWeightToDistance = weightToDistance;
+                        needTransport = necessaryTransports;
+                    }
+                }
+            }
+            BigParcel(maxDistanceAllTransports, maxLoadCapacityAllTransports, weight, distance);
+            return (needTransport);
+
+        }
+        public void BigParcel(double maxDistanceAllTransports, double maxLoadCapacityAllTransports, double distance, double weight)
+        {
+            if (maxDistanceAllTransports < distance || maxLoadCapacityAllTransports < weight)
+            {
+                Console.WriteLine("We have no transport, contact another organization, or split the parcel into several");
+                throw new OperationCanceledException();
+            }
+        }
+        public bool NotNeedTransport(Transport needTransport, DateTime departure)
+        {
+            if (needTransport == null)
+            {
+                Console.WriteLine("We don`t have transport to this date, enter new pleasy");
+                return true;
+            }
+            return false;
+        }
+        public bool NeedDriverBusy(Driver driver, Transport needTransport, DateTime departure, double distance, ConsoleKeyInfo speedOrEconom)
+        {
+            if (driver.Busy)
+            {
+                for (int i = 0; i < needTransport.Driver.numTrip; i++)
+                {
+                    var arrival = needTransport.Arrival(distance, departure, speedOrEconom);
+                    if ((departure >= driver.StartTime[i] && departure <= driver.EndtTime[i]) || (arrival >= driver.StartTime[i] && arrival <= driver.EndtTime[i]) || (departure <= driver.StartTime[i] && arrival >= driver.EndtTime[i]))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        public bool FindDriver(Transport needTransport, DateTime departure, double distance, ConsoleKeyInfo speedOrEconom)
+        {
+            var havingDriver = false;
+            foreach (var driver in drivers)
+            {
+                if (driver.CanDrive(needTransport.GetType()))
+                {
+                    needTransport.Driver = driver;
+                    havingDriver = NeedDriverBusy(driver, needTransport, departure, distance, speedOrEconom);
+                    if (havingDriver)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            return false;
+        }
+        public int NotNeedDriver(Transport needTransport, DateTime departure, Transport[] needTransportArray, int transportLength)
+        {
+            if (transportLength < transports.Length)
+            {
+                needTransportArray[transportLength] = needTransport;
+            }
+            else
+            {
+                transportLength = 0;
+                Console.WriteLine("We don`t have driver to this date, enter new pleasy");
+                return transportLength;
+            }
+            transportLength++;
+            return transportLength;
+        }
+        public DateTime DepartureNowOrLate()
+        {
+            Console.WriteLine("If you want to send the parcel now, press Enter, if you want to send the parcel later, click on another click");
+            var key = Console.ReadKey(true);
+            if(key.Key == ConsoleKey.Enter)
+            {
+                return DateTime.Now;
+            }
+            return Departure();
+        }
+        public (string transportName, DateTime date) Test(double weight, double distance, int numParcel, ConsoleKeyInfo speedOrEconom)
+        {
+            var departure = DepartureNowOrLate();
+            Transport needTransport = null;
+            var haveNotNeedTransport = false;
+            var haveNotNeedDriver = false;
+            var havingDriver = false;
+            Transport[] needTransportArray = new Transport[transports.Length];
+            var transportLength = 0;
+            while (true)
+            {
+                needTransport = FindTranport(weight, distance, departure, needTransport, needTransportArray, transportLength, speedOrEconom);
+                haveNotNeedTransport = NotNeedTransport(needTransport, departure);
+                if (haveNotNeedTransport)
+                {
+                    departure = Departure();
+                    continue;
+                }
+                havingDriver = FindDriver(needTransport, departure, distance, speedOrEconom);
+                haveNotNeedDriver = NotNeedTransport(needTransport, departure);
+                if (havingDriver)
+                {
+                    break;
+                }
+                else
+                {
+                    transportLength = NotNeedDriver(needTransport, departure, needTransportArray, transportLength);
+                    if (transportLength == 0)
+                    {
+                        departure = Departure();
+                    }
+                }
+            }
+            var needArrival = needTransport.Arrival(distance, departure, speedOrEconom);
+            needTransport.Trasfer(departure, needArrival, numParcel);
+            return (needTransport.GetType().Name, needArrival);
+        }
         public (string transportName, DateTime date) Tranfer(double weight, double distance, int numParcel)
         {
             var needTransportWeightToDistance = double.MaxValue;
@@ -79,7 +315,7 @@ namespace TransportationOfGoods
             var havingTransport = false;
             var maxDistanceAllTransports = 0d;
             var maxLoadCapacityAllTransports = 0d;
-            Transport[] needTransportMatrix = new Transport[transports.Length];
+            Transport[] needTransportArray = new Transport[transports.Length];
             var departure = Departure();
             bool flagToTransport;
             bool flagToDriver;
@@ -97,9 +333,9 @@ namespace TransportationOfGoods
                     }
                     if (transportLength!=0)
                     {
-                        for (int i = 0; i < needTransportMatrix.Length; i++)
+                        for (int i = 0; i < needTransportArray.Length; i++)
                         {
-                            if (necessaryTransports == needTransportMatrix[i])
+                            if (necessaryTransports == needTransportArray[i])
                             {
                                 havingTransport = true;
                                 break;
@@ -155,13 +391,12 @@ namespace TransportationOfGoods
                     if (driver.CanDrive(needTransport.GetType()))
                     {
                         flagToDriver = false;
-                        var arrival = needTransport.Arrival(distance, departure);
                         needTransport.Driver = driver;
                         if (driver.Busy)
                         {
                             for (int i = 0; i < needTransport.Driver.numTrip; i++)
                             {
-
+                                var arrival = needTransport.Arrival(distance, departure);
                                 if ((departure >= driver.StartTime[i] && departure <= driver.EndtTime[i]) || (arrival >= driver.StartTime[i] && arrival <= driver.EndtTime[i]) || (departure <= driver.StartTime[i] && arrival >= driver.EndtTime[i]))
                                 {
                                     flagToDriver = true;
@@ -199,7 +434,7 @@ namespace TransportationOfGoods
                     needTransportWeightToDistance = double.MaxValue;
                     try
                     {
-                        needTransportMatrix[transportLength] = needTransport;
+                        needTransportArray[transportLength] = needTransport;
                     }
                     catch (Exception)
                     {
@@ -215,8 +450,58 @@ namespace TransportationOfGoods
             needTransport.Trasfer(departure, needArrival, numParcel);
             return (needTransport.GetType().Name, needArrival);
         }
+        public (string transportName, DateTime date) Test2(double weight, double distance, int numParcel, ConsoleKeyInfo speedOrEconom)
+        {
+            var departure = DepartureNowOrLate();
+            Transport needTransport = null;
+            var haveNotNeedTransport = false;
+            var haveNotNeedDriver = false;
+            var havingDriver = false;
+            Transport[] needTransportArray = new Transport[transports.Length];
+            var transportLength = 0;
+            while (true)
+            {
+                needTransport = FindTranport(weight, distance, departure, needTransport, needTransportArray, transportLength, speedOrEconom);
+                haveNotNeedTransport = NotNeedTransport(needTransport, departure);
+                if (haveNotNeedTransport)
+                {
+                    departure = Departure();
+                    continue;
+                }
+                havingDriver = FindDriver(needTransport, departure, distance, speedOrEconom);
+                haveNotNeedDriver = NotNeedTransport(needTransport, departure);
+                if (havingDriver)
+                {
+                    break;
+                }
+                else
+                {
+                    transportLength = NotNeedDriver(needTransport, departure, needTransportArray, transportLength);
+                    if (transportLength == 0)
+                    {
+                        departure = Departure();
+                    }
+                }
+            }
+            var needArrival = needTransport.Arrival(distance, departure, speedOrEconom);
+            needTransport.Trasfer(departure, needArrival, numParcel);
+            return (needTransport.GetType().Name, needArrival);
+        }
         public (string transportName, DateTime date) TransferTrinsportsWithEngine(double weight, double distance)
         {
+            var needTransportWeightToDistance = double.MaxValue;
+            var weightToDistance = 0d;
+            Transport needTransport = null;
+            int transportLength = 0;
+            var havingDriver = false;
+            var havingTransport = false;
+            var maxDistanceAllTransports = 0d;
+            var maxLoadCapacityAllTransports = 0d;
+            Transport[] needTransportArray = new Transport[transports.Length];
+            var departure = Departure();
+            bool flagToTransport;
+            bool flagToDriver;
+
             var firstSpeed = 0d;
             var maxSpeed = 0d;
             Transport needTransport = null;
@@ -261,8 +546,8 @@ namespace TransportationOfGoods
                     }
                     else
                     {
-                        necessaryTransports.WeightTransportWithParcel = necessaryTransports.WeightTransport + weight;
-                        maxSpeed = necessaryTransports.Power / (necessaryTransports.WeightTransportWithParcel * necessaryTransports.FrictionCoefficient * 0.0098);
+                        necessaryTransports.Engine.WeightTransportWithParcel = necessaryTransports.Engine.WeightTransport + weight;
+                        maxSpeed = necessaryTransports.Engine.Power / (necessaryTransports.Engine.WeightTransportWithParcel * necessaryTransports.Engine.FrictionCoefficient * 0.0098);
                         if (maxSpeed > firstSpeed)
                         {
                             firstSpeed = maxSpeed;
