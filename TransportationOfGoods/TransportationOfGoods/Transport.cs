@@ -6,26 +6,26 @@ using System.Threading.Tasks;
 
 namespace TransportationOfGoods
 {
-    abstract class Transport : Engine, IBusy
+    abstract class Transport : IBusy
     {
         public Transport(double loadCapacity, double maxDistance, double speed)
-            :base(0,0,0,0)
         {
             LoadCapacity = loadCapacity;
             MaxDistance = maxDistance;
             Speed = speed;
         }
-        public Transport(double loadCapacity, double maxDistance, double weightTransport, double power, double weightTransportWithParcel, double frictionCoefficient)
-            :base(weightTransport, power, weightTransport, frictionCoefficient)
+        public Transport(double loadCapacity, double maxDistance, Engine engine)
         {
             LoadCapacity = loadCapacity;
             MaxDistance = maxDistance;
+            this.Engine = engine;
         }
         public bool Busy { get; set; }
         public DateTime[] StartTime { get; set; }
         public DateTime[] EndtTime { get; set; }
         public int numTrip { get; set; }
         public Driver Driver { get; set; }
+        public Engine Engine { get; set; }
         public double LoadCapacity { set; get; }
         public double MaxDistance { set; get; }
         protected double Speed { set; get; }
@@ -85,8 +85,8 @@ namespace TransportationOfGoods
             StartTime[numTrip] = dateOfDeparture;
             EndtTime[numTrip] = dateOfArrival;
             Driver.Busy = true;
-            Driver.StartTime[Driver.numTrip] = dateOfDeparture;
-            Driver.EndtTime[Driver.numTrip] = dateOfArrival;
+            Driver.StartTime[numTrip] = dateOfDeparture;
+            Driver.EndtTime[numTrip] = dateOfArrival;
             Driver.numTrip++;
             numTrip++;
         }
