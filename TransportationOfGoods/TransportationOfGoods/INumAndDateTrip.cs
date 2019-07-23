@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace TransportationOfGoods
 {
-    interface IBusy
+    interface INumAndDateTrip
     {
-        bool Busy { get; set; }
+        int numTrip { get; set; }
+        DateTime[] StartTime { get; set; }
+        DateTime[] EndtTime { get; set; }
     }
 }

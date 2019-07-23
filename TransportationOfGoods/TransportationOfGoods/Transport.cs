@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TransportationOfGoods
 {
-    abstract class Transport : IBusy
+    abstract class Transport : IBusy, INumAndDateTrip
     {
         public Transport(double loadCapacity, double maxDistance, double speed)
         {
@@ -29,28 +29,6 @@ namespace TransportationOfGoods
         public double LoadCapacity { set; get; }
         public double MaxDistance { set; get; }
         protected double Speed { set; get; }
-        public virtual DateTime Departure2()
-        {
-            DateTime dateOfDeparture = new DateTime();
-            do
-            {
-                try
-                {
-                    int year = ReadInt("year");
-                    int month = ReadInt("month");
-                    int day = ReadInt("day");
-                    int hour = ReadInt("hour");
-                    int minute = ReadInt("minute");
-                    dateOfDeparture = new DateTime(year, month, day, hour, minute, 0);
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Bed input {ex.Message}, try again or click escape");
-                }
-            } while (true);
-            return dateOfDeparture;
-        }
         public virtual DateTime Arrival (double distance, DateTime dateOfDeparture, ConsoleKeyInfo speedOrEconom)
         {
             DateTime dateOfArrival = new DateTime();
@@ -66,7 +44,7 @@ namespace TransportationOfGoods
             dateOfArrival = dateOfDeparture.Add(duration);
             return dateOfArrival;
         }
-        public virtual void Trasfer(DateTime dateOfDeparture, DateTime dateOfArrival, int numParcel)
+        public virtual void Trasfer(DateTime dateOfDeparture, DateTime dateOfArrival)
         {
             if (numTrip == 0)
             {
@@ -97,39 +75,6 @@ namespace TransportationOfGoods
             Driver.EndtTime[numTrip] = dateOfArrival;
             Driver.numTrip++;
             numTrip++;
-        }
-        public virtual DateTime TransferTransortEngine(double distance)
-        {
-            DateTime dateOfDeparture = new DateTime();
-            DateTime dateOfArrival = new DateTime();
-            if (Driver == null)
-            {
-                throw new DriverNotFoundException();
-            }
-            var l = Engine.Power / (Engine.WeightTransportWithParcel * Engine.FrictionCoefficient * 0.0098);
-            var duration = TimeSpan.FromHours(distance / (l));
-
-            do
-            {
-                try
-                {
-                    int year = ReadInt("year");
-                    int month = ReadInt("month");
-                    int day = ReadInt("day");
-                    int hour = ReadInt("hour");
-                    int minute = ReadInt("minute");
-                    dateOfDeparture = new DateTime(year, month, day, hour, minute, 0);
-                    dateOfArrival = new DateTime(year, month, day, hour, minute, 0).Add(duration);
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Bed input {ex.Message}, try again or click escape");
-                }
-            } while (true);
-            Driver.Busy = true;
-            Busy = true;
-            return dateOfArrival;
         }
 
 

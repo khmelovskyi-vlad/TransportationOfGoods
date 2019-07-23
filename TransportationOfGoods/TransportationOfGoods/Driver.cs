@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TransportationOfGoods
 {
-    class Driver: IBusy
+    class Driver: IBusy, INumAndDateTrip
     {
         public Driver(string name, Type[] skills)
         {

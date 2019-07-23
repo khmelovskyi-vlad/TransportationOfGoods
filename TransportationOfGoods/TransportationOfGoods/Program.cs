@@ -12,60 +12,22 @@ namespace TransportationOfGoods
         {
             Console.WriteLine("Sending a parcels");
             TransportPool transportPool = new TransportPool();
-            var numParcel = 0;
             while (true)
             {
-                numParcel++;
                 var weight = ReadDouble("weigth");
                 var distance = ReadDouble("distance");
                 Console.WriteLine("If you want to deliver the parcel faster click Enter, if cheaper click another key");
                 var speedOrEconom = Console.ReadKey(true);
-                if (speedOrEconom.Key == ConsoleKey.Enter)
-                {
-                    try
-                    {
-                        var needTransport = transportPool.Test2(weight, distance, numParcel, speedOrEconom);
+                Console.WriteLine("If you want to deliver the parcel with company Engine click Enter, if other company click another key");
+                var withEngineOrNot = Console.ReadKey(true);
+
+                        var needTransport = transportPool.Transfer(weight, distance, withEngineOrNot, speedOrEconom);
                         Console.WriteLine(needTransport);
                         var key = ReadChar();
                         if (key.Key == ConsoleKey.Escape)
                         {
                             break;
                         }
-                    }
-                    catch (TransortNotFoundException ex)
-                    {
-                        Console.WriteLine($"{ex.Message}");
-                        var needTransport = transportPool.Test2(weight, distance, numParcel, speedOrEconom);
-                        var key = ReadChar();
-                        if (key.Key == ConsoleKey.Escape)
-                        {
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    try
-                    {
-                        var needTransport = transportPool.Test(weight, distance, numParcel, speedOrEconom);
-                        Console.WriteLine(needTransport);
-                        var key = ReadChar();
-                        if (key.Key == ConsoleKey.Escape)
-                        {
-                            break;
-                        }
-                    }
-                    catch (TransortNotFoundException ex)
-                    {
-                        Console.WriteLine($"{ex.Message}");
-                        var needTransport = transportPool.Test(weight, distance, numParcel, speedOrEconom);
-                        var key = ReadChar();
-                        if (key.Key == ConsoleKey.Escape)
-                        {
-                            break;
-                        }
-                    }
-                }
             }
 
             Console.ReadKey();

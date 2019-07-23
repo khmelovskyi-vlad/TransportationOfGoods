@@ -55,6 +55,7 @@
     <Compile Include="FourWheels.cs" />
     <Compile Include="Gidroscutter.cs" />
     <Compile Include="IBusy.cs" />
+    <Compile Include="INumAndDateTrip.cs" />
     <Compile Include="Kamaz.cs" />
     <Compile Include="Kapeyka.cs" />
     <Compile Include="Mers.cs" />
