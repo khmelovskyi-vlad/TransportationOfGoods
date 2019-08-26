@@ -42,18 +42,29 @@ namespace TransportationOfGoods
                 new Driver("Valodya", new Type[]{typeof(Zil),typeof(Kamaz), typeof(Airplane), typeof(Mers), typeof(Kapeyka), typeof(Shipe)}),
                 new Driver("Valodya", new Type[]{typeof(Zil),typeof(Kamaz), typeof(Airplane), typeof(Mers), typeof(Kapeyka), typeof(Shipe)}),
             };
-            engines = new Engine[]
-            {
-                new Engine(0.11, 15, 0, 0.2),
-                new Engine(11111111, 1500000, 100000, 10000),
-            };
         }
 
         Transport[] transportsWithEngine;
         Transport[] transports;
         Driver[] drivers;
         Engine[] engines;
-        public virtual DateTime Departure()
+        DateTime departure;
+        Transport needTransport;
+        Transport[] extraArrayTransport;
+        double weight;
+        double distance;
+        ConsoleKeyInfo withEngineOrNot;
+        ConsoleKeyInfo speedOrEconom;
+        int transportLength;
+        Transport necessaryTransports;
+        double needTransportWeightToDistance;
+        double firstSpeed;
+        double maxDistanceAllTransports;
+        double maxLoadCapacityAllTransports;
+        double maxSpeed;
+        double weightToDistance;
+        Transport[] needTransportArray;
+        private void Departure()
         {
             DateTime dateOfDeparture = new DateTime();
             do
@@ -78,15 +89,15 @@ namespace TransportationOfGoods
                     Console.WriteLine($"Bed input {ex.Message}, try again or click escape");
                 }
             } while (true);
-            return dateOfDeparture;
+            departure = dateOfDeparture;
         }
-        public bool FindNotNeedTransportInArray(Transport[] needTransportArray, int transportLength, Transport necessaryTransports)
+        private bool FindNotNeedTransportInArray()
         {
             if (transportLength != 0)
             {
-                for (int i = 0; i < needTransportArray.Length; i++)
+                for (int i = 0; i < extraArrayTransport.Length; i++)
                 {
-                    if (necessaryTransports == needTransportArray[i])
+                    if (necessaryTransports == extraArrayTransport[i])
                     {
                         return true;
                     }
@@ -94,9 +105,8 @@ namespace TransportationOfGoods
             }
             return false;
         }
-        public (double maxDistanceAllTransports, double maxLoadCapacityAllTransports) FindMaxDistanceAndMaxLoadCapacity (Transport necessaryTransports, double maxDistanceAllTransports, double maxLoadCapacityAllTransports)
+        private void FindMaxDistanceAndMaxLoadCapacity ()
         {
-
             if (maxDistanceAllTransports < necessaryTransports.MaxDistance)
             {
                 maxDistanceAllTransports = necessaryTransports.MaxDistance;
@@ -105,9 +115,8 @@ namespace TransportationOfGoods
             {
                 maxLoadCapacityAllTransports = necessaryTransports.LoadCapacity;
             }
-            return (maxDistanceAllTransports, maxLoadCapacityAllTransports);
         }
-        public bool NecessaryTransportsBusy(DateTime departure, Transport necessaryTransports, double distance, ConsoleKeyInfo withEngineOrNot)
+        private bool NecessaryTransportsBusy()
         {
             if (necessaryTransports.Busy)
             {
@@ -122,44 +131,35 @@ namespace TransportationOfGoods
             }
             return false;
         }
-        public Transport FindTranport(double weight, double distance, DateTime departure, Transport needTransport, Transport[] needTransportArray, int transportLength, ConsoleKeyInfo withEngineOrNot, ConsoleKeyInfo speedOrEconom)
+        private Transport FindTranport()
         {
-            var maxDistanceAllTransports = 0d;
-            var maxLoadCapacityAllTransports = 0d;
             var havingTransport = false;
             var flagToTransport = false;
-            double firstSpeed = 0;
-            var maxSpeed = 0d;
-            var weightToDistance = 0d;
-            double needTransportWeightToDistance = 0;
-            Transport[] transportsOrTransportsWithEngine;
-            (needTransportWeightToDistance, firstSpeed, transportsOrTransportsWithEngine) = FindNeedArgument(withEngineOrNot, speedOrEconom);
-            foreach (var necessaryTransports in transportsOrTransportsWithEngine)
+            FindNeedArgument();
+            foreach (var necessaryTransports in needTransportArray)
             {
-                (maxDistanceAllTransports, maxLoadCapacityAllTransports) = FindMaxDistanceAndMaxLoadCapacity(necessaryTransports, maxDistanceAllTransports, maxLoadCapacityAllTransports);
-                havingTransport = FindNotNeedTransportInArray(needTransportArray, transportLength, necessaryTransports);
-                flagToTransport = NecessaryTransportsBusy(departure, necessaryTransports, distance, withEngineOrNot);
+                this.necessaryTransports = necessaryTransports;
+                FindMaxDistanceAndMaxLoadCapacity();
+                havingTransport = FindNotNeedTransportInArray();
+                flagToTransport = NecessaryTransportsBusy();
                 if (weight > necessaryTransports.LoadCapacity || distance > necessaryTransports.MaxDistance || flagToTransport || havingTransport)
                 {
                     continue;
                 }
                 if (withEngineOrNot.Key == ConsoleKey.Enter)
                 {
-                        (firstSpeed, needTransport) = FindNeedTransportsWithEngine(necessaryTransports, needTransport, maxSpeed, firstSpeed, weight, speedOrEconom);
+                        FindNeedTransportsWithEngine();
                 }
                 else
                 {
-                        (needTransportWeightToDistance, needTransport) = FindNeedTransports(necessaryTransports, needTransport, weightToDistance, needTransportWeightToDistance, speedOrEconom);
+                        FindNeedTransports();
                 }
             }
-            BigParcel(maxDistanceAllTransports, maxLoadCapacityAllTransports, weight, distance);
+            BigParcel();
             return (needTransport);
         }
-        public (double needTransportWeightToDistance, double firstSpeed, Transport[] transportsOrTransportsWithEngine) FindNeedArgument(ConsoleKeyInfo withEngineOrNot, ConsoleKeyInfo speedOrEconom)
+        private void FindNeedArgument()
         {
-            double needTransportWeightToDistance;
-            double firstSpeed;
-            Transport[] transportsOrTransportsWithEngine;
             if (speedOrEconom.Key == ConsoleKey.Enter)
             {
                 needTransportWeightToDistance = 0d;
@@ -172,15 +172,14 @@ namespace TransportationOfGoods
             }
             if (withEngineOrNot.Key == ConsoleKey.Enter)
             {
-                transportsOrTransportsWithEngine = transportsWithEngine;
+                needTransportArray = transportsWithEngine;
             }
             else
             {
-                transportsOrTransportsWithEngine = transports;
+                needTransportArray = transports;
             }
-            return (needTransportWeightToDistance, firstSpeed, transportsOrTransportsWithEngine);
         }
-        public (double firstSpeed, Transport needTransport) FindNeedTransportsWithEngine(Transport necessaryTransports, Transport needTransport, double maxSpeed, double firstSpeed, double weight, ConsoleKeyInfo speedOrEconom)
+        private void FindNeedTransportsWithEngine()
         {
             necessaryTransports.Engine.WeightTransportWithParcel = necessaryTransports.Engine.WeightTransport + weight;
             maxSpeed = necessaryTransports.Engine.Power / (necessaryTransports.Engine.WeightTransportWithParcel * necessaryTransports.Engine.FrictionCoefficient * 0.0098);
@@ -200,9 +199,8 @@ namespace TransportationOfGoods
                     needTransport = necessaryTransports;
                 }
             }
-            return (firstSpeed, needTransport);
         }
-        public (double needTransportWeightToDistance, Transport needTransport) FindNeedTransports(Transport necessaryTransports, Transport needTransport, double weightToDistance, double needTransportWeightToDistance, ConsoleKeyInfo speedOrEconom)
+        private void FindNeedTransports()
         {
             weightToDistance = necessaryTransports.LoadCapacity * necessaryTransports.MaxDistance;
             if (speedOrEconom.Key == ConsoleKey.Enter)
@@ -221,9 +219,8 @@ namespace TransportationOfGoods
                     needTransport = necessaryTransports;
                 }
             }
-            return (needTransportWeightToDistance, needTransport);
         }
-        public void BigParcel(double maxDistanceAllTransports, double maxLoadCapacityAllTransports, double distance, double weight)
+        private void BigParcel()
         {
             if (maxDistanceAllTransports < distance || maxLoadCapacityAllTransports < weight)
             {
@@ -231,7 +228,7 @@ namespace TransportationOfGoods
                 throw new OperationCanceledException();
             }
         }
-        public bool NotNeedTransport(Transport needTransport, DateTime departure)
+        private bool NotNeedTransport()
         {
             if (needTransport == null)
             {
@@ -240,7 +237,7 @@ namespace TransportationOfGoods
             }
             return false;
         }
-        public bool NeedDriverBusy(Driver driver, Transport needTransport, DateTime departure, double distance, ConsoleKeyInfo withEngineOrNot)
+        private bool NeedDriverBusy(Driver driver)
         {
             if (driver.Busy)
             {
@@ -255,7 +252,7 @@ namespace TransportationOfGoods
             }
             return true;
         }
-        public bool FindDriver(Transport needTransport, DateTime departure, double distance, ConsoleKeyInfo withEngineOrNot)
+        private bool FindDriver()
         {
             var havingDriver = false;
             foreach (var driver in drivers)
@@ -263,7 +260,7 @@ namespace TransportationOfGoods
                 if (driver.CanDrive(needTransport.GetType()))
                 {
                     needTransport.Driver = driver;
-                    havingDriver = NeedDriverBusy(driver, needTransport, departure, distance, withEngineOrNot);
+                    havingDriver = NeedDriverBusy(driver);
                     if (havingDriver)
                     {
                         return true;
@@ -276,78 +273,75 @@ namespace TransportationOfGoods
             }
             return false;
         }
-        public int NotNeedDriver(Transport needTransport, DateTime departure, Transport[] needTransportArray, int transportLength, ConsoleKeyInfo withEngineOrNot)
+        private void NotNeedDriver()
         {
-            Transport[] findTransports;
-            if (withEngineOrNot.Key == ConsoleKey.Enter)
-            {
-                findTransports = transportsWithEngine;
-            }
-            else
-            {
-                findTransports = transports;
-            }
-                if (transportLength < findTransports.Length)
+                if (transportLength < needTransportArray.Length)
                 {
-                    needTransportArray[transportLength] = needTransport;
+                    extraArrayTransport[transportLength] = needTransport;
                 }
                 else
                 {
                     transportLength = 0;
                     Console.WriteLine("We don`t have driver to this date, enter new pleasy");
-                    return transportLength;
+                    return;
                 }
                 transportLength++;
-                return transportLength;
         }
-        public DateTime DepartureNowOrLate()
+        private void DepartureNowOrLate()
         {
             Console.WriteLine("If you want to send the parcel now, press Enter, if you want to send the parcel later, click on another click");
             var key = Console.ReadKey(true);
             if(key.Key == ConsoleKey.Enter)
             {
-                return DateTime.Now;
+                departure = DateTime.Now;
+                return;
             }
-            return Departure();
+            Departure();
         }
-        public (string transportName, DateTime date) Transfer(double weight, double distance, ConsoleKeyInfo withEngineOrNot, ConsoleKeyInfo speedOrEconom)
+        private void FindExtraArrayTransport()
         {
-            var departure = DepartureNowOrLate();
-            Transport needTransport = null;
-            var haveNotNeedTransport = false;
-            var haveNotNeedDriver = false;
-            var havingDriver = false;
-            Transport[] needTransportArray;
             if (withEngineOrNot.Key == ConsoleKey.Enter)
             {
-                needTransportArray = new Transport[transportsWithEngine.Length];
+                extraArrayTransport = new Transport[transportsWithEngine.Length];
             }
             else
             {
-                needTransportArray = new Transport[transports.Length];
+                extraArrayTransport = new Transport[transports.Length];
             }
-            var transportLength = 0;
+        }
+        public (string transportName, DateTime date) Transfer(double weightTransfer, double distanceTransfer, ConsoleKeyInfo withEngineOrNotTransfer, ConsoleKeyInfo speedOrEconomTransfer)
+        {
+            DepartureNowOrLate();
+            var haveNotNeedTransport = false;
+            var haveNotNeedDriver = false;
+            var havingDriver = false;
+            weight = weightTransfer;
+            distance = distanceTransfer;
+            withEngineOrNot = withEngineOrNotTransfer;
+            speedOrEconom = speedOrEconomTransfer;
+            FindExtraArrayTransport();
+            transportLength = 0;
             while (true)
             {
-                needTransport = FindTranport(weight, distance, departure, needTransport, needTransportArray, transportLength, withEngineOrNot, speedOrEconom);
-                haveNotNeedTransport = NotNeedTransport(needTransport, departure);
+                needTransport = FindTranport();
+                haveNotNeedTransport = NotNeedTransport();
                 if (haveNotNeedTransport)
                 {
-                    departure = Departure();
+                    Departure();
                     continue;
                 }
-                havingDriver = FindDriver(needTransport, departure, distance, withEngineOrNot);
-                haveNotNeedDriver = NotNeedTransport(needTransport, departure);
+                havingDriver = FindDriver();
+                haveNotNeedDriver = NotNeedTransport();
                 if (havingDriver)
                 {
                     break;
                 }
                 else
                 {
-                    transportLength = NotNeedDriver(needTransport, departure, needTransportArray, transportLength, withEngineOrNot);
+                    NotNeedDriver();
                     if (transportLength == 0)
                     {
-                        departure = Departure();
+                        Departure();
                     }
                 }
             }

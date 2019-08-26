@@ -76,29 +76,5 @@ namespace TransportationOfGoods
             Driver.numTrip++;
             numTrip++;
         }
-
-
-        static int ReadInt(string readInt)
-        {
-            do
-            {
-                try
-                {
-                    Console.WriteLine($"Enter {readInt}");
-                    var key = Console.ReadKey();
-                    if (key.Key == ConsoleKey.Escape)
-                    {
-                        throw new OperationCanceledException();
-                    }
-                    var line = Console.ReadLine();
-                    var keyLine = $"{key.KeyChar}{line}";
-                    return Convert.ToInt32((keyLine));
-                }
-                catch (FormatException ex)
-                {
-                    Console.WriteLine($"Bed input {ex.Message}, try again or click escape");
-                }
-            } while (true);
-        }
     }
 }

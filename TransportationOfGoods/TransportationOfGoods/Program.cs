@@ -29,7 +29,7 @@ namespace TransportationOfGoods
                             break;
                         }
             }
-
+            Console.WriteLine("Bye");
             Console.ReadKey();
         }
         static double ReadDouble (string readInt)
@@ -56,7 +56,7 @@ namespace TransportationOfGoods
         }
         static ConsoleKeyInfo ReadChar()
         {
-            Console.WriteLine("If you want to send a new parcel click Enter, otherwise, click Escape");
+            Console.WriteLine("If you don`t want to send a new parcel click Escape, otherwise, click anouther key");
             var key = Console.ReadKey(true);
             return key;
 
